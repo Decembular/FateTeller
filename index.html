@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chaotic Prophecy Fireworks</title>
+
+<style>
+  * { box-sizing: border-box; margin:0; padding:0; }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Poppins', Arial, sans-serif;
+    overflow: hidden;
+    background: #1151a1;
+    color: #fff;
+  }
+
+  /* FIREWORKS PARTICLE */
+  .particle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    opacity: 0.8;
+    pointer-events: none;
+    animation: rise 1.5s ease-out forwards;
+  }
+
+  @keyframes rise {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-100px) scale(0.5); opacity: 0; }
+  }
+
+  /* CARD */
+  .card {
+    position: relative;
+    z-index: 10;
+    background: rgba(245,245,245,0.85);
+    backdrop-filter: blur(12px);
+    padding: 28px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 380px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    animation: popIn 0.8s ease;
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  h1 {
+    font-size: 1.6rem;
+    color: #1151a1;
+    margin-bottom: 10px;
+  }
+
+  p {
+    font-size: 1rem;
+    color: #333;
+    opacity: 0.85;
+    margin-bottom: 20px;
+  }
+
+  input {
+    width: 100%;
+    padding: 14px;
+    font-size: 1rem;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    margin-bottom: 16px;
+    outline: none;
+  }
+
+  button {
+    width: 100%;
+    padding: 14px;
+    font-size: 1rem;
+    border-radius: 14px;
+    border: none;
+    background: #c22a29;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+  }
+
+  button:hover {
+    background: #a02125;
+    transform: scale(1.03);
+  }
+
+  /* MODAL */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    z-index: 15;
+  }
+
+  .modal {
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 22px;
+    padding: 28px;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    animation: modalPop 0.4s ease forwards;
+  }
+
+  @keyframes modalPop {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .modal p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    color: #1151a1;
+    font-weight: 600;
+  }
+
+  .close-btn {
+    padding: 12px;
+    width: 50%;
+    border-radius: 999px;
+    border: none;
+    background: #fce910;
+    color: #1151a1;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.2s;
+  }
+
+  .close-btn:hover { transform: scale(1.05); }
+
+  /* LOADING DOTS */
+  .loading {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    gap: 6px;
+  }
+
+  .loading div {
+    width: 10px;
+    height: 10px;
+    background: #c22a29;
+    border-radius: 50%;
+    animation: bounce 0.6s infinite alternate;
+  }
+
+  .loading div:nth-child(2) { animation-delay: 0.2s; }
+  .loading div:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce {
+    to { transform: translateY(-10px); }
+  }
+
+</style>
+</head>
+
+<body>
+
+<div class="card" id="card">
+  <h1>✨ Your Chaotic Fate</h1>
+  <p>Type your name and let the cosmic nonsense unfold.</p>
+  <input type="text" id="nameInput" placeholder="Your name…"/>
+  <button onclick="revealFate()">Reveal Fate</button>
+
+  <!-- Loading container -->
+  <div id="loadingContainer" style="display:none;">
+    <div class="loading">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal">
+    <p id="result"></p>
+    <button class="close-btn" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<script>
+  const fortunes = [
+    "lengkuasmu akan menjadi daging.",
+    "kamu akan menang giveaway decembular.",
+    "Gojo akan hidup lagi.",
+    "jemuranmu akan keujanan.", 
+    "CEO akan hukum kamu asap.",
+    "twitter km akan diblock Amanda Zahra.",
+    "kamu akan kelolodan kangkung besok.",
+    "orang terakhir di roomchat kamu adalah jodoh varel bramasta.",
+    "sepatumu akan ketempelan tai kucing."
+    "kamu akan dapat akun kosongan gratis.",
+    "selamat rumah anda akan dibedah.",
+    "Briptu Norman bangga sama km.",
+    "jangan sekali-kali berenang di cucian mama.",
+    "bilangin mamah kamu makasih udah ngelahirin anak seoke kamu.",
+    "cobain tiduran di tanaman hias ayah.",
+    "tolong diapakan dulu apa itu biar ga apa kali.",
+    "awas ada jule, prikitiw.",
+    "laundry langgananmu tutup."
+  ];
+
+  function revealFate(){
+    const loading = document.getElementById("loadingContainer");
+    const nameInput = document.getElementById("nameInput");
+
+    // Show loading
+    loading.style.display = "flex";
+    nameInput.disabled = true;
+
+    setTimeout(()=> {
+      loading.style.display = "none";
+      nameInput.disabled = false;
+
+      const name = nameInput.value.trim() || "You";
+      const randomFortune = fortunes[Math.floor(Math.random()*fortunes.length)];
+      document.getElementById("result").innerText = `${name}, ${randomFortune}`;
+      document.getElementById("overlay").style.display = "flex";
+
+      createFireworks();
+    }, 1500); // 1.5 detik loading
+  }
+
+  function closeModal(){
+    document.getElementById("overlay").style.display = "none";
+  }
+
+  // FIREWORKS PARTICLES
+  function createFireworks(){
+    for(let i=0;i<30;i++){
+      const p = document.createElement("div");
+      p.classList.add("particle");
+      const size = Math.random()*6+4;
+      p.style.width = `${size}px`;
+      p.style.height = `${size}px`;
+      p.style.left = `${Math.random()*100}vw`;
+      p.style.background = ['#c22a29','#fce910','#1151a1'][Math.floor(Math.random()*3)];
+      p.style.animationDuration = `${1+Math.random()*1}s`;
+      document.body.appendChild(p);
+      setTimeout(()=>p.remove(), 1500);
+    }
+  }
+</script>
+
+</body>
+</html>
+
